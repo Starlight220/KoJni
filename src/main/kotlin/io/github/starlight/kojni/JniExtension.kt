@@ -26,7 +26,7 @@ open class JniExtension(private val project: Project) {
     ByteArrayOutputStream().use { outputStream ->
       project.exec {
         it.executable = javap.absolutePath
-        it.args = listOf(file.absolutePath)
+        it.args = listOf("-private", file.absolutePath)
         it.standardOutput = outputStream
       }
       val output = outputStream.toString()

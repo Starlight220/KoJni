@@ -2,8 +2,8 @@ package io.github.starlight.kojni
 
 class JniFile(val u_fqcontainer: String, functions: Set<JniFunction>) {
   val n_functions by lazy {
-    val builder = StringBuilder()
-    functions.forEach { builder.append(it.buildFunction()).append('\n') }
+    val builder by lazy { StringBuilder() }
+    functions.forEach { builder.append(it.buildFunction()) }
     return@lazy builder.toString()
   }
 
@@ -18,9 +18,7 @@ class JniFile(val u_fqcontainer: String, functions: Set<JniFunction>) {
         #ifdef __cplusplus
         extern "C" {
         #endif
-        
         ${n_functions}
-
         #ifdef __cplusplus
         }
         #endif

@@ -27,7 +27,6 @@ class JniFunction(
          */
         JNIEXPORT ${mapTypeToC(retVal)} JNICALL Java_${fqcontainer}_${methodName}
           (JNIEnv *, ${if (isStatic) "jclass" else "jobject"}${c_args});
-        
     """
   }
 }

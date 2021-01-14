@@ -11,8 +11,9 @@ open class GenerateJniHeaders() : DefaultTask() {
 
   @TaskAction
   fun generate() {
+    val analyzer = Analyzer(this)
     jniExt.run {
-      classfiles()[0].let { runJavaP(it) }.let { Analyzer.analyzeFile(it) }.buildFile().let {
+      classfiles()[0].let { runJavaP(it) }.let { analyzer.analyzeFile(it) }.buildFile().let {
         logger.warn(it)
       }
     }
