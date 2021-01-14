@@ -1,8 +1,8 @@
 plugins {
-    `java-gradle-plugin`
-    `maven-publish`
-    kotlin("jvm") version "1.4.20"
     id ("com.gradle.plugin-publish") version "0.12.0"
+    `java-gradle-plugin`
+    kotlin("jvm") version "1.4.20"
+    `maven-publish`
     id("com.diffplug.spotless") version "5.9.0"
 }
 
@@ -13,8 +13,20 @@ repositories {
     mavenLocal()
 }
 
+publishing {
+    repositories {
+        mavenLocal()
+    }
+}
+
+pluginBundle {
+    website = "https://github.com/Starlight220/KoJni"
+    vcsUrl = "https://github.com/Starlight220/KoJni"
+}
+
 dependencies {
     implementation(gradleKotlinDsl())
+    implementation(kotlin("reflect:1.4.20"))
 
 
     testImplementation("org.junit.jupiter:junit-jupiter-api:5.4.2")
@@ -22,10 +34,12 @@ dependencies {
     testRuntimeOnly("org.junit.jupiter:junit-jupiter-engine:5.4.2")
 }
 
+version = "0.0.1"
+group = "io.github.starlight"
 gradlePlugin {
     plugins {
-        create("KoJni") {
-            id = "io.github.starlight"
+        val kojni by creating {
+            id = "io.github.starlight.KoJni"
             implementationClass = "io.github.starlight.kojni.KoJniPlugin"
         }
     }
