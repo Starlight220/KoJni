@@ -26,7 +26,7 @@ pluginBundle {
 
 dependencies {
     implementation(gradleKotlinDsl())
-    implementation(kotlin("reflect:1.4.20"))
+    runtimeOnly(kotlin("reflect","1.4.20"))
 
 
     testImplementation("org.junit.jupiter:junit-jupiter-api:5.4.2")
