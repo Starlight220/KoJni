@@ -5,35 +5,33 @@ class JniFunction(
     val isStatic: Boolean,
     val methodName: String,
     val retVal: String,
-    args: List<String>
+    args: List<String>?
 ) {
   val c_args: String by lazy {
     val builder = StringBuilder()
-    args.forEach { builder.append(", ").append(mapTypeToC(it)) }
+    args?.forEach { builder.append(", ").append(mapTypeToC(it)) }
     return@lazy builder.toString()
   }
   val d_args: String by lazy {
     val builder = StringBuilder()
-    args.forEach { builder.append(mapTypeToD(it)) }
+    args?.forEach { builder.append(mapTypeToD(it)) }
     return@lazy builder.toString()
   }
 
-  fun buildFunction(): String {
-    return """
-        /*
-         * Class:     ${fqcontainer}
-         * Method:    ${methodName}
-         * Signature: (${d_args})${mapTypeToD(retVal)}
-         */
-        JNIEXPORT ${mapTypeToC(retVal)} JNICALL Java_${fqcontainer}_${methodName}
-          (JNIEnv *, ${if (isStatic) "jclass" else "jobject"}${c_args});
-    """
-  }
+  fun buildFunction(): String = """
+      /*
+       * Class:     ${fqcontainer}
+       * Method:    ${methodName}
+       * Signature: (${d_args})${mapTypeToD(retVal)}
+       */
+      JNIEXPORT ${mapTypeToC(retVal)} JNICALL Java_${fqcontainer}_${methodName}
+        (JNIEnv *, ${if (isStatic) "jclass" else "jobject"}${c_args});
+  """
 }
 
 val javaPrimitives = setOf("boolean", "byte", "char", "short", "int", "long", "float", "double")
 
-internal fun mapTypeToC(type: String, recursed: Boolean = false): String {
+internal fun mapTypeToC(type: String): String {
   return when (type.trim()) {
     in javaPrimitives -> "j${type.trim()}"
     "void" -> "void"

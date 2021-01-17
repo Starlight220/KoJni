@@ -3,22 +3,31 @@ package io.github.starlight.kojni
 import java.io.ByteArrayOutputStream
 import java.io.File
 import org.gradle.api.Project
+import org.gradle.api.Task
 import org.gradle.internal.jvm.Jvm
 
 open class JniExtension(private val project: Project) {
   var libName: String = "lib"
   var headerDir: String = "$libName/src/main/headers"
-  var implDir: String = "lib/src/main/cpp"
-  var lang: Language = Language.Kotlin
+//  var implDir: String = "lib/src/main/cpp"
+//  var lang: Language = Language.Kotlin
   var modules: MutableCollection<String> = mutableSetOf("main")
   var classesPath: String = "classes/kotlin/main/"
-  var generateImpl: Boolean = true
+//  var generateImpl: Boolean = true
   var javaHome: File = Jvm.current().javaHome
+  var includePrivate = true
 
-  internal fun classfiles() =
-      project.buildDir.resolve(classesPath.replace('/', File.separatorChar)).walk().toSet().filter {
-        it.extension == "class"
-      }
+  internal fun classfiles(): List<File> {
+    val ret = project
+          .buildDir
+          .resolve(classesPath.replace('/', File.separatorChar))
+          .walk()
+          .toSet()
+          .filter { it.extension == "class" }
+//          .filter { "native" in it.readText() }
+    project.logger.info(ret.toString())
+    return ret
+  }
 
   private val javap = javaHome.resolve("bin").resolve("javap")
 
@@ -26,7 +35,7 @@ open class JniExtension(private val project: Project) {
     ByteArrayOutputStream().use { outputStream ->
       project.exec {
         it.executable = javap.absolutePath
-        it.args = listOf("-private", file.absolutePath)
+        it.args = listOf(if (includePrivate) "-private" else "", file.absolutePath)
         it.standardOutput = outputStream
       }
       val output = outputStream.toString()

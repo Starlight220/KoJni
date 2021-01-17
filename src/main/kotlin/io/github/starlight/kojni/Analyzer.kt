@@ -18,19 +18,16 @@ class Analyzer(task: DefaultTask) {
     val classHeaderLineIdx =
         lines.indexOfFirst { line ->
           headerRegex.find(line)?.destructured?.let {
-            containerName = it.component1().replace(".", "_")
+            containerName = it.component1()
             true
           }
               ?: false
-        }
-    if (classHeaderLineIdx == -1) {
-      return JniFile("-1", emptySet()) // fail("No class declaration found")
-    }
+        }.takeUnless { it == -1 } ?: return JniFile("-1", emptySet())
+
     logger.info(containerName)
     logger.info(lines.toString())
-    val endInx = lines.indexOfLast { endRegex.matches(it) }
 
-    lines.forEach { line -> buildLineData(line, containerName)?.let { jniMethods.add(it) } }
+    lines.forEach { line -> buildLineData(line, containerName.replace(".", "_"))?.let { jniMethods.add(it) } }
     logger.info(jniMethods.size.toString())
     logger.info("------------\n")
     return JniFile(containerName, jniMethods)
@@ -49,7 +46,7 @@ class Analyzer(task: DefaultTask) {
         fqcontainer = fqcontainer,
         retVal = retVal,
         methodName = name,
-        args = arglist.split(','),
+        args = arglist.takeUnless { arglist.isBlank() }?.split(','),
         isStatic = line.contains("static"))
   }
 }
