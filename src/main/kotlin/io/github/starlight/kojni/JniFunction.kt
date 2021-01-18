@@ -1,24 +1,27 @@
 package io.github.starlight.kojni
 
 class JniFunction(
-    val fqcontainer: String,
-    val isStatic: Boolean,
-    val methodName: String,
-    val retVal: String,
+    private val fqcontainer: String,
+    private val isStatic: Boolean,
+    private val methodName: String,
+    private val retVal: String,
     args: List<String>?
 ) {
-  val c_args: String by lazy {
-    val builder = StringBuilder()
-    args?.forEach { builder.append(", ").append(mapTypeToC(it)) }
-    return@lazy builder.toString()
+  private val c_args: String by lazy {
+    args?.joinToString(separator = ", ", prefix = ", ", transform = ::mapTypeToC) ?: ""
   }
-  val d_args: String by lazy {
-    val builder = StringBuilder()
-    args?.forEach { builder.append(mapTypeToD(it)) }
-    return@lazy builder.toString()
+  private val d_args: String by lazy {
+    args?.joinToString(separator = "", transform = ::mapTypeToD) ?: ""
+  }
+  private val c_args_named: String by lazy {
+    args
+        ?.mapIndexed { index: Int, s: String -> mapTypeToC(s) + " param${'$'}${index}" }
+        ?.joinToString(prefix = ", ", separator = ", ")
+        ?: ""
   }
 
-  fun buildFunction(): String = """
+  fun buildFunction(): String =
+      """
       /*
        * Class:     ${fqcontainer}
        * Method:    ${methodName}
@@ -27,9 +30,16 @@ class JniFunction(
       JNIEXPORT ${mapTypeToC(retVal)} JNICALL Java_${fqcontainer}_${methodName}
         (JNIEnv *, ${if (isStatic) "jclass" else "jobject"}${c_args});
   """
+
+  fun impl(): String =
+      """
+    JNIEXPORT ${mapTypeToC(retVal)} JNICALL Java_${fqcontainer}_${methodName}
+      (JNIEnv *env, ${if (isStatic) "jclass clazz" else "jobject thisObj"}${c_args_named}) {}
+  """
 }
 
-val javaPrimitives = setOf("boolean", "byte", "char", "short", "int", "long", "float", "double")
+private val javaPrimitives =
+    setOf("boolean", "byte", "char", "short", "int", "long", "float", "double")
 
 internal fun mapTypeToC(type: String): String {
   return when (type.trim()) {

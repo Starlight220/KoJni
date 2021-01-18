@@ -7,11 +7,12 @@ import org.gradle.kotlin.dsl.register
 
 class KoJniPlugin : Plugin<Project> {
   private lateinit var project: Project
+  private lateinit var jniExt: JniExtension
   override fun apply(target: Project) {
     project = target
-    target.extensions.create<JniExtension>("jni", target)
+    jniExt = target.extensions.create<JniExtension>("jni", target)
 
-    target.tasks.register<GenerateJniHeaders>("generateJni")
+    target.tasks.register<GenerateJniHeaders>("generateJni") { generateImpl = jniExt.generateImpl }
   }
   //
   //    fun fail(message: String): Nothing {

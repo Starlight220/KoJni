@@ -9,25 +9,30 @@ class Analyzer(task: DefaultTask) {
       Regex("public (?:final|abstract)? (?:class|enum) ([a-z]+[.][A-Za-z0-9_]+) \\{")
   private val endRegex: Regex = Regex("}")
 
-  fun analyzeFile(javapOutput: String): JniFile {
+  fun analyzeFile(javapOutput: String): JniFile? {
     logger.info("\n===========Analyzer::analyzeFile=======")
     logger.info(javapOutput)
+    if ("native" !in javapOutput) return null
     val jniMethods = HashSet<JniFunction>(javapOutput.length - 4)
     var lines = javapOutput.split(System.lineSeparator())
     var containerName: String = ""
-    val classHeaderLineIdx =
-        lines.indexOfFirst { line ->
+    lines
+        .indexOfFirst { line ->
           headerRegex.find(line)?.destructured?.let {
             containerName = it.component1()
             true
           }
               ?: false
-        }.takeUnless { it == -1 } ?: return JniFile("-1", emptySet())
+        }
+        .takeUnless { it == -1 }
+        ?: throw Exception("invalid line")
 
     logger.info(containerName)
     logger.info(lines.toString())
 
-    lines.forEach { line -> buildLineData(line, containerName.replace(".", "_"))?.let { jniMethods.add(it) } }
+    lines.forEach { line ->
+      buildLineData(line, containerName.replace(".", "_"))?.let { jniMethods.add(it) }
+    }
     logger.info(jniMethods.size.toString())
     logger.info("------------\n")
     return JniFile(containerName, jniMethods)
