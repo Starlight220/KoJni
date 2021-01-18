@@ -19,11 +19,6 @@ publishing {
     }
 }
 
-pluginBundle {
-    website = "https://github.com/Starlight220/KoJni"
-    vcsUrl = "https://github.com/Starlight220/KoJni"
-}
-
 dependencies {
     implementation(gradleKotlinDsl())
     runtimeOnly(kotlin("reflect","1.4.20"))
@@ -35,15 +30,22 @@ dependencies {
     testImplementation(gradleTestKit())
 }
 
-version = "0.0.1"
+version = "1.0.0"
 group = "io.github.starlight"
 gradlePlugin {
     plugins {
         val kojni by creating {
             id = "io.github.starlight.KoJni"
             implementationClass = "io.github.starlight.kojni.KoJniPlugin"
+            displayName = "KoJni"
         }
     }
+}
+pluginBundle {
+    website = "https://github.com/Starlight220/KoJni"
+    vcsUrl = "https://github.com/Starlight220/KoJni"
+    description = "A Gradle plugin for generating JNI headers."
+    tags = listOf("jni", "kotlin")
 }
 
 tasks.test {
