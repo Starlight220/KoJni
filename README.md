@@ -1,3 +1,4 @@
+[![Plugin Portal](https://img.shields.io/maven-metadata/v?label=Gradle%20Plugin%20Portal&color=blue&metadataUrl=https://plugins.gradle.org/m2/io/github/starlight/KoJni/maven-metadata.xml)](https://plugins.gradle.org/plugin/io.github.starlight.KoJni)
 # KoJni
 
 A Gradle Plugin for generating JNI header files.
@@ -44,11 +45,11 @@ Root `build.gradle.kts` for this example:
 ```kotlin
 plugins {
   kotlin("jvm") version "1.4.21" // kotlin plugin
-  id("io.github.starlight.KoJni") version "0.0.1"
+  id("io.github.starlight.KoJni") version "1.0.0"
 }
 repositories {
-  jcenter()
   mavenCentral()
+  jcenter()
 }
 jni {
   libName = "example" // name of jni lib folder 
